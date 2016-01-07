@@ -64,7 +64,7 @@ def main():
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(description='Run IZBot')
+    parser = argparse.ArgumentParser(description='Run ButtieBot')
 
     parser.add_argument('--polling', '-p', dest='polling', type=int, default=2,
                         help='interval (in seconds) to check for message updates')
