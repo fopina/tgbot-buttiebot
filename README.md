@@ -12,9 +12,10 @@ This repository is ready for openshift (as the bot is running there), so you can
 
     ```
     rhc app-create buttiebot python-2.7 postgresql-9.2 cron-1.4 --from-code https://github.com/fopina/tgbot-buttiebot/
+    cd buttiebot
     rhc env-set TGTOKEN=<YOUR_BOT_TOKEN>
     rhc ssh -- 'app-root/repo/buttiebot.py --db_url="postgresql://$OPENSHIFT_POSTGRESQL_DB_HOST:$OPENSHIFT_POSTGRESQL_DB_PORT/$PGDATABASE" --create_db'
-    rhc app-start
+    rhc app-restart
     ```
     
 Have fun!
