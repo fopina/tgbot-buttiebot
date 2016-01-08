@@ -1,8 +1,8 @@
 */setcommands*
 
 ```
-buttme - Get a butt at the right time of the day
 butt - Random butt to cheer your day
+buttme - Get a butt at the right time of the day
 ```
 
 */setabouttext*
