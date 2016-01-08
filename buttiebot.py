@@ -54,7 +54,7 @@ def main():
     if args.cron is not None:
         for p in tg._plugins:
             if hasattr(p, 'cron_go'):
-                p.cron_go(tg, *args.cron)
+                p.cron_go(*args.cron)
         return
 
     if args.webhook is None:

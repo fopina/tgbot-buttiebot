@@ -18,11 +18,11 @@ class InstagramPlugin(TGPluginBase):
             TGCommandBase('buttmeoff', self.buttmeoff, 'disable /buttme', printable=False),
         )
 
-    def butt(self, bot, message, text):
-        self._butt(bot, message.chat.id, text)
+    def butt(self, message, text):
+        self._butt(message.chat.id, text)
 
-    def _butt(self, bot, chat_id, text):
-        bot.send_chat_action(chat_id, ChatAction.TEXT)
+    def _butt(self, chat_id, text):
+        self.bot.send_chat_action(chat_id, ChatAction.TEXT)
         for i in xrange(3):
             ig = choice((
                 'buttsnorkeler',
@@ -56,9 +56,9 @@ class InstagramPlugin(TGPluginBase):
         if not text:
             text = '%s (%d likes)' % (pic['caption'], pic['likes']['count'])
 
-        bot.send_photo(chat_id=chat_id, caption=text, photo=InputFile('photo', file_info))
+        self.bot.send_photo(chat_id=chat_id, caption=text, photo=InputFile('photo', file_info))
 
-    def buttme(self, bot, message, text):
+    def buttme(self, message, text):
         a = self.read_data(message.chat.id)
 
         if a is True:
@@ -66,19 +66,19 @@ class InstagramPlugin(TGPluginBase):
         else:
             msg = 'Butt disabled, use /buttmeon to enable it'
 
-        bot.send_message(message.chat.id, msg)
+        self.bot.send_message(message.chat.id, msg)
 
-    def buttmeon(self, bot, message, text):
+    def buttmeon(self, message, text):
         self.save_data(message.chat.id, obj=True)
-        bot.send_message(message.chat.id, 'Butt enabled, use /buttmeoff to disable it')
+        self.bot.send_message(message.chat.id, 'Butt enabled, use /buttmeoff to disable it')
 
-    def buttmeoff(self, bot, message, text):
+    def buttmeoff(self, message, text):
         self.save_data(message.chat.id, obj=False)
-        bot.send_message(message.chat.id, 'Butt disabled, use /buttmeon to enable it')
+        self.bot.send_message(message.chat.id, 'Butt disabled, use /buttmeon to enable it')
 
-    def cron_go(self, bot, action, param):
+    def cron_go(self, action, param):
         if action == 'instagram.butt':
             for chat in self.iter_data_keys():
                 if self.read_data(chat):
                     print "Sending butt to %s" % chat
-                    self._butt(bot, chat, param)
+                    self._butt(chat, param)

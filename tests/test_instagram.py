@@ -12,7 +12,6 @@ class FakePhotoTelegramBot(plugintest.FakeTelegramBot):
     def send_photo(self, chat_id, photo, caption=None, reply_to_message_id=None, reply_markup=None, **kwargs):
         self._sent_messages.append(([chat_id, caption], kwargs))
         self._current_message_id += 1
-        print 'oi'
         return FakePhotoTelegramBot.FakeRPCRequest(Message.from_result({
             'message_id': self._current_message_id,
             'chat': {
@@ -23,7 +22,8 @@ class FakePhotoTelegramBot(plugintest.FakeTelegramBot):
 
 class InsultaPluginTest(plugintest.PluginTestCase):
     def setUp(self):
-        self.bot = FakePhotoTelegramBot('', plugins=[InstagramPlugin()])
+        self.plugin = InstagramPlugin()
+        self.bot = FakePhotoTelegramBot('', plugins=[self.plugin])
         self.received_id = 1
 
     def receive_message(self, text, sender=None, chat=None):
@@ -72,8 +72,8 @@ class InsultaPluginTest(plugintest.PluginTestCase):
         self.assertIn('#ButtSnorkeler', self.last_reply(self.bot))
 
     def test_butt_cron(self):
-        InstagramPlugin().cron_go(self.bot, 'instagram.butt', '')
+        self.plugin.cron_go('instagram.butt', '')
         self.assertEqual(len(self.bot._sent_messages), 0)
         self.test_buttmeon()
-        InstagramPlugin().cron_go(self.bot, 'instagram.butt', 'test cron')
+        self.plugin.cron_go('instagram.butt', 'test cron')
         self.assertReplied(self.bot, 'test cron')
