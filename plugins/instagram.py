@@ -23,22 +23,28 @@ class InstagramPlugin(TGPluginBase):
 
     def _butt(self, chat_id, text):
         self.bot.send_chat_action(chat_id, ChatAction.TEXT)
+
         for i in xrange(3):
-            ig = choice((
-                'buttsnorkeler',
-                # 'buttbuilding',  # crappy one...
+            ig, keyword_filter = choice((
+                ('buttsnorkeler', 'Snorkeled'),
+                # ('buttbuilding', ' '),  # crappy one...
             ))
             r = requests.get('https://instagram.com/%s/' % ig)
             m = re.findall('<script type="text\/javascript">window._sharedData = (.*?);</script>', r.content)
             s = json.loads(m[0])
             last_pics = self.read_data(chat_id, key2='last_' + ig)
             try:
-                pics = s['entry_data']['ProfilePage'][0]['user']['media']['nodes']
+                pics = [x for x in s['entry_data']['ProfilePage'][0]['user']['media']['nodes'] if keyword_filter in x['caption']]
                 break
             except KeyError:
                 pass
             from time import sleep
             sleep(1)
+
+        if not pics:
+            self.bot.send_message(chat_id, 'Sorry, no butts found right now...')
+            return
+
         if last_pics is None:
             last_pics = []
         else:

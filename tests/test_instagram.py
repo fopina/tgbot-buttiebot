@@ -20,7 +20,7 @@ class FakePhotoTelegramBot(plugintest.FakeTelegramBot):
         }))
 
 
-class InsultaPluginTest(plugintest.PluginTestCase):
+class InstagramPluginTest(plugintest.PluginTestCase):
     def setUp(self):
         self.plugin = InstagramPlugin()
         self.bot = FakePhotoTelegramBot('', plugins=[self.plugin])
