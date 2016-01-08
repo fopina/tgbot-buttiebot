@@ -12,10 +12,10 @@ import mimetypes
 class InstagramPlugin(TGPluginBase):
     def list_commands(self):
         return (
-            TGCommandBase('butt', self.butt, 'random butt to cheer your day'),
-            TGCommandBase('buttme', self.buttme, 'get a butt at the right time of the day'),
-            TGCommandBase('buttmeon', self.buttmeon, 'enable /buttme', printable=False),
-            TGCommandBase('buttmeoff', self.buttmeoff, 'disable /buttme', printable=False),
+            TGCommandBase('butt', self.butt, 'Random butt to cheer your day'),
+            TGCommandBase('buttme', self.buttme, 'Get a butt at the right time of the day'),
+            TGCommandBase('buttmeon', self.buttmeon, 'Enable /buttme', printable=False),
+            TGCommandBase('buttmeoff', self.buttmeoff, 'Disable /buttme', printable=False),
         )
 
     def butt(self, message, text):
