@@ -1,6 +1,6 @@
 # coding=utf-8
 from tgbot import plugintest
-from twx.botapi import Update, Message
+from tgbot.botapi import Update, Message
 from plugins.instagram import InstagramPlugin
 
 from requests.packages import urllib3
