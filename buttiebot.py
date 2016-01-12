@@ -2,7 +2,7 @@
 # coding=utf-8
 
 import tgbot
-from plugins import instagram
+from plugins import instagram, intro
 import argparse
 from requests.packages import urllib3
 urllib3.disable_warnings()
@@ -13,6 +13,7 @@ def setup(db_url=None, token=None):
         token,
         plugins=[
             instagram.InstagramPlugin(),
+            intro.IntroPlugin(),
         ],
         db_url=db_url,
     )
