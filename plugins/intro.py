@@ -3,6 +3,11 @@ from tgbot.pluginbase import TGPluginBase, TGCommandBase
 
 
 class IntroPlugin(TGPluginBase):
+    def __init__(self, intro_text='Hello!', markdown=False):
+        super(IntroPlugin, self).__init__()
+        self._text = intro_text
+        self._use_markdown = markdown
+
     def list_commands(self):
         return (
             TGCommandBase('start', self.start, 'Introduction', printable=False),
@@ -11,13 +16,6 @@ class IntroPlugin(TGPluginBase):
     def start(self, message, text):
         self.bot.send_message(
             message.chat.id,
-            '''\
-If you'd like to be cheered at the right time of the day, try /buttme
-
-Anytime you feel like, you can request a /butt
-
-Do not forget to rate me!
-https://telegram.me/storebot?start=buttiebot
-            ''',
-            parse_mode='Markdown'
+            self._text,
+            parse_mode='Markdown' if self._use_markdown else None
         )

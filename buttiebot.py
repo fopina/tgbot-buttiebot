@@ -13,7 +13,17 @@ def setup(db_url=None, token=None):
         token,
         plugins=[
             instagram.InstagramPlugin(),
-            intro.IntroPlugin(),
+            intro.IntroPlugin(
+                intro_text='''\
+If you'd like to be cheered at the right time of the day, try /buttme
+
+Anytime you feel like, you can request a /butt
+
+_Do not forget to rate me!_
+https://telegram.me/storebot?start=buttiebot
+            ''',
+                markdown=True
+            ),
         ],
         db_url=db_url,
     )
