@@ -69,7 +69,7 @@ class InstagramPluginTest(plugintest.PluginTestCase):
 
     def test_butt(self):
         self.receive_message('/butt')
-        self.assertIn('#ButtSnorkeler', self.last_reply(self.bot))
+        self.assertIn('Snorkeled', self.last_reply(self.bot))
 
     def test_butt_cron(self):
         self.plugin.cron_go('instagram.butt', '')
