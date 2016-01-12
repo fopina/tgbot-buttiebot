@@ -91,5 +91,9 @@ class InstagramPlugin(TGPluginBase):
                     print "Sending butt to %s" % chat
                     r = self._butt(chat, param)
                     if isinstance(r, Error):
-                        print r
+                        if r.error_code == 403:
+                            print '%s blocked bot' % chat
+                            self.save_data(chat, obj=False)
+                        else:
+                            print 'Error for', chat, ': ', r
                     sleep(0.5)
