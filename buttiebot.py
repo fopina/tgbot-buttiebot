@@ -67,7 +67,7 @@ def main():
 def build_parser():
     parser = argparse.ArgumentParser(description='Run ButtieBot')
 
-    parser.add_argument('--polling', '-p', dest='polling', type=int, default=2,
+    parser.add_argument('--polling', '-p', dest='polling', type=float, default=2,
                         help='interval (in seconds) to check for message updates')
     parser.add_argument('--db_url', '-d', dest='db_url', default='sqlite:///buttiebot.sqlite3',
                         help='URL for database (default is sqlite:///buttiebot.sqlite3)')
