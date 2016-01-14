@@ -41,10 +41,10 @@ def openshift_app():
         ),
         token=os.environ['TGTOKEN']
     )
-    bot.set_webhook('https://%s/update/%s' % (os.environ['OPENSHIFT_APP_DNS'], bot._token))
+    bot.set_webhook('https://%s/update/%s' % (os.environ['OPENSHIFT_APP_DNS'], bot.token))
 
     from tgbot.webserver import wsgi_app
-    return wsgi_app(bot)
+    return wsgi_app([bot])
 
 
 def main():
