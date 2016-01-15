@@ -48,16 +48,24 @@ class InstagramPlugin(TGPluginBase):
 
         self.save_data(chat_id, key2=pic['id'], obj=True)
 
-        fp = StringIO(requests.get(pic['display_src']).content)
-        file_info = InputFileInfo(pic['display_src'].split('/')[-1], fp, mimetypes.guess_type(pic['display_src'])[0])
-
         if not text:
             text = '%s (%d likes)' % (pic['caption'], pic['likes']['count'])
 
+        photo = self.read_data('cache', key2=pic['id'])
+
+        if photo:
+            r = self.bot.send_photo(chat_id=chat_id, caption=text, photo=photo).wait()
+            if not isinstance(r, Error):
+                return r
+
+        fp = StringIO(requests.get(pic['display_src']).content)
+        file_info = InputFileInfo(pic['display_src'].split('/')[-1], fp, mimetypes.guess_type(pic['display_src'])[0])
         r = self.bot.send_photo(chat_id=chat_id, caption=text, photo=InputFile('photo', file_info)).wait()
+
         if isinstance(r, Error):
             return r
-
+        if r.photo:
+            self.save_data('cache', key2=pic['id'], obj=r.photo[0].file_id)
         return r
 
     def buttme(self, message, text):
@@ -83,6 +91,8 @@ class InstagramPlugin(TGPluginBase):
             from time import sleep
 
             for chat in self.iter_data_keys():
+                if chat == 'cache':
+                    continue
                 if self.read_data(chat):
                     print "Sending butt to %s" % chat
                     r = self._butt(chat, param)
@@ -91,5 +101,5 @@ class InstagramPlugin(TGPluginBase):
                             print '%s blocked bot' % chat
                             self.save_data(chat, obj=False)
                         else:
-                            print 'Error for', chat, ': ', r
+                            print 'Error for', chat, ': ', r  # pragma: no cover
                     sleep(0.5)
