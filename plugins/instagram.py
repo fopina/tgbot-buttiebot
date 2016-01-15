@@ -1,6 +1,6 @@
 # coding=utf-8
 from tgbot.pluginbase import TGPluginBase, TGCommandBase
-from tgbot.tgbot import ChatAction, InputFile, InputFileInfo
+from tgbot.tgbot import ChatAction, InputFile, InputFileInfo, Error
 from random import choice
 import requests
 import re
@@ -24,7 +24,7 @@ class InstagramPlugin(TGPluginBase):
     def _butt(self, chat_id, text):
         self.bot.send_chat_action(chat_id, ChatAction.PHOTO)
 
-        pics = None
+        pics = []
         for i in xrange(3):
             ig, keyword_filter = choice((
                 ('buttsnorkeler', 'Snorkeled'),
@@ -33,7 +33,6 @@ class InstagramPlugin(TGPluginBase):
             r = requests.get('https://instagram.com/%s/' % ig)
             m = re.findall('<script type="text\/javascript">window._sharedData = (.*?);<\/script>', r.content)
             s = json.loads(m[0])
-            last_pics = self.read_data(chat_id, key2='last_' + ig)
             try:
                 pics = [x for x in s['entry_data']['ProfilePage'][0]['user']['media']['nodes'] if keyword_filter in x['caption']]
                 break
@@ -42,19 +41,12 @@ class InstagramPlugin(TGPluginBase):
             from time import sleep
             sleep(1)
 
+        pics = [x for x in pics if not self.read_data(chat_id, x['id'])]
         if not pics:
             return self.bot.send_message(chat_id, 'Sorry, no butts found right now...').wait()
-
-        if last_pics is None:
-            last_pics = []
-        else:
-            pics = [x for x in pics if x['id'] not in last_pics]
         pic = choice(pics)
 
-        last_pics.append(pic['id'])
-        if len(last_pics) > 10:
-            del last_pics[0]
-        self.save_data(chat_id, key2='last_' + ig, obj=last_pics)
+        self.save_data(chat_id, pic['id'])
 
         fp = StringIO(requests.get(pic['display_src']).content)
         file_info = InputFileInfo(pic['display_src'].split('/')[-1], fp, mimetypes.guess_type(pic['display_src'])[0])
@@ -62,7 +54,11 @@ class InstagramPlugin(TGPluginBase):
         if not text:
             text = '%s (%d likes)' % (pic['caption'], pic['likes']['count'])
 
-        return self.bot.send_photo(chat_id=chat_id, caption=text, photo=InputFile('photo', file_info)).wait()
+        r = self.bot.send_photo(chat_id=chat_id, caption=text, photo=InputFile('photo', file_info)).wait()
+        if isinstance(r, Error):
+            return r
+
+        return r
 
     def buttme(self, message, text):
         a = self.read_data(message.chat.id)
@@ -85,7 +81,6 @@ class InstagramPlugin(TGPluginBase):
     def cron_go(self, action, param):
         if action == 'instagram.butt':
             from time import sleep
-            from tgbot.botapi import Error
 
             for chat in self.iter_data_keys():
                 if self.read_data(chat):
