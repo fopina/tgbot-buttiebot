@@ -24,13 +24,14 @@ class InstagramPlugin(TGPluginBase):
     def _butt(self, chat_id, text):
         self.bot.send_chat_action(chat_id, ChatAction.PHOTO)
 
+        pics = None
         for i in xrange(3):
             ig, keyword_filter = choice((
                 ('buttsnorkeler', 'Snorkeled'),
                 # ('buttbuilding', ' '),  # crappy one...
             ))
             r = requests.get('https://instagram.com/%s/' % ig)
-            m = re.findall('<script type="text\/javascript">window._sharedData = (.*?);</script>', r.content)
+            m = re.findall('<script type="text\/javascript">window._sharedData = (.*?);<\/script>', r.content)
             s = json.loads(m[0])
             last_pics = self.read_data(chat_id, key2='last_' + ig)
             try:

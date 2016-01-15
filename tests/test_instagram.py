@@ -70,6 +70,22 @@ class InstagramPluginTest(plugintest.PluginTestCase):
     def test_butt(self):
         self.receive_message('/butt')
         self.assertIn('Snorkeled', self.last_reply(self.bot))
+        self.receive_message('/butt')
+        self.assertIn('Snorkeled', self.last_reply(self.bot))
+
+    def test_butt_no_pics(self):
+        import requests
+
+        def fget(*args, **kwargs):
+            r = type('Test', (object,), {})
+            r.content = '''
+            <script type="text/javascript">window._sharedData = {};</script>
+            '''
+            return r
+
+        requests.get = fget
+        self.receive_message('/butt')
+        self.assertReplied(self.bot, 'Sorry, no butts found right now...')
 
     def test_butt_cron(self):
         self.plugin.cron_go('instagram.butt', '')
