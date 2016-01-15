@@ -1,6 +1,6 @@
 # coding=utf-8
 from tgbot import plugintest
-from tgbot.botapi import Update, Message
+from tgbot.botapi import Update, Message, Error
 from plugins.instagram import InstagramPlugin
 
 from requests.packages import urllib3
@@ -9,15 +9,24 @@ urllib3.disable_warnings()
 
 class FakePhotoTelegramBot(plugintest.FakeTelegramBot):
     # TODO - improve this and it to tgbotplug
+    def __init__(self, *args, **kwargs):
+        plugintest.FakeTelegramBot.__init__(self, *args, **kwargs)
+        self.return_blocked_error = False
+
     def send_photo(self, chat_id, photo, caption=None, reply_to_message_id=None, reply_markup=None, **kwargs):
         self._sent_messages.append(([chat_id, caption], kwargs))
         self._current_message_id += 1
-        return FakePhotoTelegramBot.FakeRPCRequest(Message.from_result({
-            'message_id': self._current_message_id,
-            'chat': {
-                'id': chat_id,
-            }
-        }))
+        if self.return_blocked_error:
+            return FakePhotoTelegramBot.FakeRPCRequest(
+                Error.from_result({'ok': False, 'error_code': 403})
+            )
+        else:
+            return FakePhotoTelegramBot.FakeRPCRequest(Message.from_result({
+                'message_id': self._current_message_id,
+                'chat': {
+                    'id': chat_id,
+                }
+            }))
 
 
 class InstagramPluginTest(plugintest.PluginTestCase):
@@ -95,6 +104,8 @@ class InstagramPluginTest(plugintest.PluginTestCase):
         self.assertReplied(self.bot, 'test cron')
 
     def test_butt_cron_blocked(self):
-        self.test_buttmeon()
+        self.test_buttmeon()  # enable buttme
+        self.bot.return_blocked_error = True  # block bot
         self.plugin.cron_go('instagram.butt', 'test cron')
         self.assertReplied(self.bot, 'test cron')
+        self.test_buttme()  # check buttme was disabled
