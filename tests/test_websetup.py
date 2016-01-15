@@ -50,6 +50,7 @@ class WebTest(plugintest.PluginTestCase):
         self.assertEqual(len(FakeTelegramBotRPCRequest.QUEUE), 0)
         self.webapp.post_json('/update/123', params=self.build_update(u'/butt'))
         self.assertTrue(len(FakeTelegramBotRPCRequest.QUEUE))
+        self.assertEqual(FakeTelegramBotRPCRequest.QUEUE[-1], 'sendPhoto')
         self.assertEqual(FakeTelegramBotRPCRequest.QUEUE[-1][0], 'sendPhoto')
         self.assertIn('Snorkeled', FakeTelegramBotRPCRequest.QUEUE[-1][1]['caption'])
 

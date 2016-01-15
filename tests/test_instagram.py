@@ -74,7 +74,7 @@ class InstagramPluginTest(plugintest.PluginTestCase):
         self.assertIn('Snorkeled', self.last_reply(self.bot))
 
     def test_butt_no_pics(self):
-        import requests
+        import mock
 
         def fget(*args, **kwargs):
             r = type('Test', (object,), {})
@@ -83,13 +83,18 @@ class InstagramPluginTest(plugintest.PluginTestCase):
             '''
             return r
 
-        requests.get = fget
-        self.receive_message('/butt')
-        self.assertReplied(self.bot, 'Sorry, no butts found right now...')
+        with mock.patch('requests.get', fget):
+            self.receive_message('/butt')
+            self.assertReplied(self.bot, 'Sorry, no butts found right now...')
 
     def test_butt_cron(self):
         self.plugin.cron_go('instagram.butt', '')
         self.assertEqual(len(self.bot._sent_messages), 0)
+        self.test_buttmeon()
+        self.plugin.cron_go('instagram.butt', 'test cron')
+        self.assertReplied(self.bot, 'test cron')
+
+    def test_butt_cron_blocked(self):
         self.test_buttmeon()
         self.plugin.cron_go('instagram.butt', 'test cron')
         self.assertReplied(self.bot, 'test cron')
