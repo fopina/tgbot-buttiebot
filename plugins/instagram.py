@@ -43,10 +43,10 @@ class InstagramPlugin(TGPluginBase):
 
         pics = [x for x in pics if not self.read_data(chat_id, x['id'])]
         if not pics:
-            return self.bot.send_message(chat_id, 'Sorry, no butts found right now...').wait()
+            return self.bot.send_message(chat_id, 'Sorry, no new butts found right now...').wait()
         pic = choice(pics)
 
-        self.save_data(chat_id, pic['id'])
+        self.save_data(chat_id, key2=pic['id'], obj=True)
 
         fp = StringIO(requests.get(pic['display_src']).content)
         file_info = InputFileInfo(pic['display_src'].split('/')[-1], fp, mimetypes.guess_type(pic['display_src'])[0])
