@@ -54,7 +54,7 @@ class InstagramPlugin(TGPluginBase):
         photo = self.read_data('cache', key2=pic['id'])
 
         if photo:
-            r = self.bot.send_photo(chat_id=chat_id, caption=text, photo=photo).wait()
+            r = self.bot.send_photo(chat_id=chat_id, caption=text, photo=photo.encode('utf-8')).wait()
             if not isinstance(r, Error):
                 return r
 
