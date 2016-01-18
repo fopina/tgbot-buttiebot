@@ -1,6 +1,6 @@
 # coding=utf-8
 from tgbot.pluginbase import TGPluginBase, TGCommandBase
-from tgbot.tgbot import ChatAction, InputFile, InputFileInfo, Error
+from tgbot.tgbot import ChatAction, InputFile, InputFileInfo, Error, ForceReply
 from random import choice
 import requests
 import re
@@ -14,6 +14,7 @@ class InstagramPlugin(TGPluginBase):
         return (
             TGCommandBase('butt', self.butt, 'Random butt to cheer your day'),
             TGCommandBase('buttme', self.buttme, 'Get a butt at the right time of the day'),
+            TGCommandBase('buttgmt', self.buttgmt, 'Set your timezone'),
             TGCommandBase('buttmeon', self.buttmeon, 'Enable /buttme', printable=False),
             TGCommandBase('buttmeoff', self.buttmeoff, 'Disable /buttme', printable=False),
         )
@@ -68,6 +69,41 @@ class InstagramPlugin(TGPluginBase):
             self.save_data('cache', key2=pic['id'], obj=r.photo[0].file_id)
         return r
 
+    def buttgmt(self, message, text):
+        self.bot.send_chat_action(message.chat.id, ChatAction.TEXT)
+        if not text:
+            m = self.bot.send_message(
+                message.chat.id,
+                '''\
+What's your GMT offset?
+Example, if you are in Beijing (China), the timezone is GMT+8, so you answer:
+*8*
+If you are in Bostan (USA), it is GMT-5, so you answer:
+*-5*
+Apologies to India, Iran and some other places, but offsets are integers at the moment, so half-hour deviations are not supported...''',
+                reply_to_message_id=message.message_id,
+                reply_markup=ForceReply.create(selective=True),
+                parse_mode='Markdown'
+            ).wait()
+            self.need_reply(self.buttgmt, message, out_message=m, selective=True)
+            return
+
+        try:
+            offset = int(text)
+        except:
+            offset = -999
+
+        if offset < -12 or offset > 12:
+            res = 'Invalid offset value. It should be a number between -12 and 12'
+        else:
+            res = 'Timezone set to GMT'
+            if offset >= 0:
+                res += '+'
+            res += str(offset)
+            self.save_data(message.chat.id, key2='timezone', obj=offset)
+
+        self.bot.send_message(message.chat.id, res, parse_mode='Markdown')
+
     def buttme(self, message, text):
         a = self.read_data(message.chat.id)
 
@@ -88,36 +124,43 @@ class InstagramPlugin(TGPluginBase):
 
     def cron_go(self, action, *args):
         if action == 'instagram.butt':
-            import time
+            return self.cron_butt()
 
-            hour = time.gmtime().tm_hour
-            for chat in self.iter_data_keys():
-                if chat == 'cache':
-                    continue
-                if self.read_data(chat):
-                    offset = self.read_data(chat, 'timezone')
+    def cron_butt(self):
+        import time
+
+        hour = time.gmtime().tm_hour
+        for chat in self.iter_data_keys():
+            if chat == 'cache':
+                continue
+            if self.read_data(chat):
+                try:
+                    offset = int(self.read_data(chat, 'timezone'))
                     if not offset:
                         offset = 0
-                    lhour = (hour + offset) % 24
+                except:
+                    offset = 0
 
-                    if lhour == 9:
-                        msg = 'Good morning!'
-                    elif lhour == 13:
-                        msg = 'Bon appetit!'
-                    elif lhour == 18:
-                        msg = 'Time to relax...'
+                lhour = (hour + offset) % 24
+
+                if lhour == 9:
+                    msg = 'Good morning!'
+                elif lhour == 13:
+                    msg = 'Bon appetit!'
+                elif lhour == 18:
+                    msg = 'Time to relax...'
+                else:
+                    continue
+
+                print "Sending butt to %s" % chat
+                time_start = time.time()
+                r = self._butt(chat, msg)
+                if isinstance(r, Error):
+                    if r.error_code == 403:
+                        print '%s blocked bot' % chat
+                        self.save_data(chat, obj=False)
                     else:
-                        continue
-
-                    print "Sending butt to %s" % chat
-                    time_start = time.time()
-                    r = self._butt(chat, msg)
-                    if isinstance(r, Error):
-                        if r.error_code == 403:
-                            print '%s blocked bot' % chat
-                            self.save_data(chat, obj=False)
-                        else:
-                            print 'Error for', chat, ': ', r  # pragma: no cover
-                    time_taken = time.time() - time_start
-                    if time_taken < 0.5:  # pragma: no cover
-                        time.sleep(0.5 - time_taken)
+                        print 'Error for', chat, ': ', r  # pragma: no cover
+                time_taken = time.time() - time_start
+                if time_taken < 0.5:  # pragma: no cover
+                    time.sleep(0.5 - time_taken)

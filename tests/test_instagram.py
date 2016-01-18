@@ -174,3 +174,51 @@ class InstagramPluginTest(plugintest.PluginTestCase):
             self.plugin.cron_go('instagram.butt')
             self.assertReplied(self.bot, 'Bon appetit!')  # some message was still sent, doesn't really matter
             self.test_buttme()  # check buttme was disabled
+
+    def test_buttgmt(self):
+        self.receive_message('/buttgmt +3')
+        self.assertReplied(self.bot, 'Timezone set to GMT+3')
+        self.test_buttmeon()
+
+        import mock
+        import time
+
+        with mock.patch(
+            'time.gmtime',
+            return_value=time.struct_time((2016, 1, 18, 9, 50, 36, 0, 18, 0))
+        ):
+            self.bot._sent_messages = []  # clear messages
+            self.plugin.cron_go('instagram.butt')
+            self.assertRaisesRegexp(AssertionError, 'No replies', self.last_reply, self.bot)
+
+        with mock.patch(
+            'time.gmtime',
+            return_value=time.struct_time((2016, 1, 18, 6, 50, 36, 0, 18, 0))
+        ):
+            self.plugin.cron_go('instagram.butt')
+            self.assertReplied(self.bot, 'Good morning!')
+
+        self.receive_message('/buttgmt -5')
+        self.assertReplied(self.bot, 'Timezone set to GMT-5')
+
+        with mock.patch(
+            'time.gmtime',
+            return_value=time.struct_time((2016, 1, 18, 18, 50, 36, 0, 18, 0))
+        ):
+            self.plugin.cron_go('instagram.butt')
+            self.assertReplied(self.bot, 'Bon appetit!')
+
+    def test_buttgmt_validation(self, error_msg='Invalid offset value. It should be a number between -12 and 12'):
+        self.receive_message('/buttgmt')
+        self.receive_message('3')
+        self.assertReplied(self.bot, 'Timezone set to GMT+3')
+        self.receive_message('/buttgmt a')
+        self.assertReplied(self.bot, error_msg)
+        self.receive_message('/buttgmt -5')
+        self.assertReplied(self.bot, 'Timezone set to GMT-5')
+        self.receive_message('/buttgmt -11.5')
+        self.assertReplied(self.bot, error_msg)
+        self.receive_message('/buttgmt 0')
+        self.assertReplied(self.bot, 'Timezone set to GMT+0')
+        self.receive_message('/buttgmt 14')
+        self.assertReplied(self.bot, error_msg)
