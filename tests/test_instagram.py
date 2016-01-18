@@ -248,3 +248,9 @@ Your timezone is set to *GMT+3*, use /buttgmt to change it.''')
         self.assertReplied(self.bot, 'Timezone set to GMT+0')
         self.receive_message('/buttgmt 14')
         self.assertReplied(self.bot, error_msg)
+
+    def test_broadcast(self):
+        self.test_buttmeon()
+        self.plugin.save_data('cache', key2='1', obj='2')  # some cache for coverage
+        self.plugin.cron_go('instagram.broadcast', 'test 1 2 3')
+        self.assertReplied(self.bot, 'test 1 2 3')
