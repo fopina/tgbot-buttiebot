@@ -139,7 +139,7 @@ Your timezone is set to *%s*, use /buttgmt to change it.''' % tz
 
         self.bot.send_message(message.chat.id, '''\
 Butt enabled, use /buttmeoff to disable it.
-Your timezone is set to *%s*, use /buttgmt to change it.''' % tz)
+Your timezone is set to *%s*, use /buttgmt to change it.''' % tz, parse_mode='Markdown')
 
     def buttmeoff(self, message, text):
         self.save_data(message.chat.id, obj=False)
