@@ -148,6 +148,8 @@ Your timezone is set to *%s*, use /buttgmt to change it.''' % tz, parse_mode='Ma
     def cron_go(self, action, *args):
         if action == 'instagram.butt':
             return self.cron_butt()
+        elif action == 'instagram.broadcast':
+            return self.cron_broadcast(*args)
 
     def cron_butt(self):
         import time
@@ -184,6 +186,29 @@ Your timezone is set to *%s*, use /buttgmt to change it.''' % tz, parse_mode='Ma
                         self.save_data(chat, obj=False)
                     else:
                         print 'Error for', chat, ': ', r  # pragma: no cover
+                time_taken = time.time() - time_start
+                if time_taken < 0.5:  # pragma: no cover
+                    time.sleep(0.5 - time_taken)
+
+    def cron_broadcast(self, message):
+        '''
+        Broadcast a message to all /buttme subscribers
+        '''
+        import time
+
+        if not message:
+            import sys
+            message = sys.stdin.read()
+
+        for chat in self.iter_data_keys():
+            if chat == 'cache':
+                continue
+            if self.read_data(chat):
+                print "Sending message to %s" % chat
+                time_start = time.time()
+                r = self.bot.send_message(chat, message, parse_mode='Markdown').wait()
+                if isinstance(r, Error):
+                    print 'Error for', chat, ': ', r  # pragma: no cover
                 time_taken = time.time() - time_start
                 if time_taken < 0.5:  # pragma: no cover
                     time.sleep(0.5 - time_taken)

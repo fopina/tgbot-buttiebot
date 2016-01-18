@@ -3,6 +3,7 @@
 ```
 butt - Random butt to cheer your day
 buttme - Get a butt at the right time of the day
+buttgmt - Set your timezone
 ```
 
 */setabouttext*
