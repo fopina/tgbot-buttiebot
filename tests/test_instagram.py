@@ -113,15 +113,64 @@ class InstagramPluginTest(plugintest.PluginTestCase):
             self.assertReplied(self.bot, 'Sorry, no new butts found right now...')
 
     def test_butt_cron(self):
-        self.plugin.cron_go('instagram.butt', '')
-        self.assertEqual(len(self.bot._sent_messages), 0)
-        self.test_buttmeon()
-        self.plugin.cron_go('instagram.butt', 'test cron')
-        self.assertReplied(self.bot, 'test cron')
+        import mock
+        import time
+        import requests
+
+        rget = requests.get
+
+        # no need to actually download the pictures here...
+        def nopicget(*args, **kwargs):
+            if 'cdninstagram.com' in args[0]:
+                r = type('Test', (object,), {})
+                r.content = ''
+                return r
+            return rget(*args, **kwargs)
+
+        with mock.patch('requests.get', nopicget):
+            with mock.patch(
+                'time.gmtime',
+                return_value=time.struct_time((2016, 1, 18, 9, 50, 36, 0, 18, 0))
+            ):
+                self.plugin.cron_go('instagram.butt')
+                self.assertEqual(len(self.bot._sent_messages), 0)
+                self.test_buttmeon()
+                self.plugin.cron_go('instagram.butt')
+                self.assertReplied(self.bot, 'Good morning!')
+
+            with mock.patch(
+                'time.gmtime',
+                return_value=time.struct_time((2016, 1, 18, 13, 50, 36, 0, 18, 0))
+            ):
+                self.plugin.cron_go('instagram.butt')
+                self.assertReplied(self.bot, 'Bon appetit!')
+
+            with mock.patch(
+                'time.gmtime',
+                return_value=time.struct_time((2016, 1, 18, 18, 50, 36, 0, 18, 0))
+            ):
+                self.plugin.cron_go('instagram.butt')
+                self.assertReplied(self.bot, 'Time to relax...')
+
+            with mock.patch(
+                'time.gmtime',
+                return_value=time.struct_time((2016, 1, 18, 20, 50, 36, 0, 18, 0))
+            ):
+                self.bot._sent_messages = []  # clear messages
+                self.plugin.cron_go('instagram.butt')
+                self.assertRaisesRegexp(AssertionError, 'No replies', self.last_reply, self.bot)
 
     def test_butt_cron_blocked(self):
         self.test_buttmeon()  # enable buttme
         self.bot.return_blocked_error = True  # block bot
-        self.plugin.cron_go('instagram.butt', 'test cron')
-        self.assertReplied(self.bot, 'test cron')
-        self.test_buttme()  # check buttme was disabled
+
+        import mock
+        import time
+
+        with mock.patch(
+            'time.gmtime',
+            return_value=time.struct_time((2016, 1, 18, 13, 50, 36, 0, 18, 0))
+        ):
+            self.plugin.cron_go('instagram.butt')
+            self.assertReplied(self.bot, 'Bon appetit!')  # some message was still sent, doesn't really matter
+            self.test_buttme()  # check buttme was disabled

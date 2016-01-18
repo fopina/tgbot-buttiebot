@@ -86,17 +86,32 @@ class InstagramPlugin(TGPluginBase):
         self.save_data(message.chat.id, obj=False)
         self.bot.send_message(message.chat.id, 'Butt disabled, use /buttmeon to enable it')
 
-    def cron_go(self, action, param):
+    def cron_go(self, action, *args):
         if action == 'instagram.butt':
             import time
 
+            hour = time.gmtime().tm_hour
             for chat in self.iter_data_keys():
                 if chat == 'cache':
                     continue
                 if self.read_data(chat):
+                    offset = self.read_data(chat, 'timezone')
+                    if not offset:
+                        offset = 0
+                    lhour = (hour + offset) % 24
+
+                    if lhour == 9:
+                        msg = 'Good morning!'
+                    elif lhour == 13:
+                        msg = 'Bon appetit!'
+                    elif lhour == 18:
+                        msg = 'Time to relax...'
+                    else:
+                        continue
+
                     print "Sending butt to %s" % chat
                     time_start = time.time()
-                    r = self._butt(chat, param)
+                    r = self._butt(chat, msg)
                     if isinstance(r, Error):
                         if r.error_code == 403:
                             print '%s blocked bot' % chat
@@ -104,5 +119,5 @@ class InstagramPlugin(TGPluginBase):
                         else:
                             print 'Error for', chat, ': ', r  # pragma: no cover
                     time_taken = time.time() - time_start
-                    if time_taken < 0.5:
+                    if time_taken < 0.5:  # pragma: no cover
                         time.sleep(0.5 - time_taken)

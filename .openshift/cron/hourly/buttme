@@ -1,20 +1,3 @@
 #!/bin/bash
 
-WEEK=$(TZ=Europe/Lisbon date +%u)
-HOUR=$(TZ=Europe/Lisbon date +%H)
-MSG=""
-
-if [ "$WEEK" -le 5 ]; then
-	if [ "$HOUR" == "09" ]; then
-		MSG="Good morning!"
-	elif [ "$HOUR" == "13" ]; then
-		MSG="Bon appetit!"
-	elif [ "$HOUR" == "18" ]; then
-		MSG="Time to relax..."
-	fi
-fi
-
-if [ -n "$MSG" ]; then
-	cd $OPENSHIFT_REPO_DIR
-	./buttiebot.py -d postgresql://$OPENSHIFT_POSTGRESQL_DB_HOST:$OPENSHIFT_POSTGRESQL_DB_PORT/$PGDATABASE -t $TGTOKEN --cron instagram.butt "$MSG"
-fi
+$OPENSHIFT_REPO_DIR/buttiebot.py -d postgresql://$OPENSHIFT_POSTGRESQL_DB_HOST:$OPENSHIFT_POSTGRESQL_DB_PORT/$PGDATABASE -t $TGTOKEN --cron instagram.butt ""
