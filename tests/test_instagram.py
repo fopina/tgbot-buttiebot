@@ -25,7 +25,12 @@ class FakePhotoTelegramBot(plugintest.FakeTelegramBot):
                 'message_id': self._current_message_id,
                 'chat': {
                     'id': chat_id,
-                }
+                },
+                'photo': [
+                    {
+                        'file_id': '123_AB-C'
+                    }
+                ]
             }))
 
 
