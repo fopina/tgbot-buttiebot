@@ -100,6 +100,23 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
             self.receive_message('/butt')
             self.assertReplied(self.bot, 'Sorry, no new butts found right now...')
 
+    def test_butt_cache(self):
+        import mock
+
+        def fget(*args, **kwargs):
+            r = type('Test', (object,), {})
+            r.content = '''
+            <script type="text/javascript">window._sharedData = {"entry_data":{"ProfilePage":[{"user": {"media": {"nodes":[{"caption": "Snorkeled", "id": "123", "likes": {"count": 1}, "display_src": "http://i1079.photobucket.com/albums/w514/skmobi/skmobi/site/logo.png"}]}}}]}};</script>
+            '''
+            return r
+
+        # insert cache entry
+        self.plugin.save_data('cache', key2='123', obj='whatever')
+
+        with mock.patch('requests.get', fget):
+            self.receive_message('/butt')
+            self.assertIn('Snorkeled', self.last_reply(self.bot))
+
     def test_butt_no_pics(self):
         import mock
 
