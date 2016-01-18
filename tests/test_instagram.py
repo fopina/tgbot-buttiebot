@@ -64,7 +64,9 @@ class InstagramPluginTest(plugintest.PluginTestCase):
         self.receive_message('/buttme')
         self.assertReplied(self.bot, status)
 
-    def test_buttmeon(self, status=u'Butt enabled, use /buttmeoff to disable it'):
+    def test_buttmeon(self, status=u'''\
+Butt enabled, use /buttmeoff to disable it.
+Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
         self.test_buttme()
         self.receive_message('/buttmeon')
         self.assertReplied(self.bot, status)
@@ -178,7 +180,9 @@ class InstagramPluginTest(plugintest.PluginTestCase):
     def test_buttgmt(self):
         self.receive_message('/buttgmt +3')
         self.assertReplied(self.bot, 'Timezone set to GMT+3')
-        self.test_buttmeon()
+        self.test_buttmeon(status=u'''\
+Butt enabled, use /buttmeoff to disable it.
+Your timezone is set to *GMT+3*, use /buttgmt to change it.''')
 
         import mock
         import time

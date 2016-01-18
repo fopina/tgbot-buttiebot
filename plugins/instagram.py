@@ -106,17 +106,40 @@ Apologies to India, Iran and some other places, but offsets are integers at the 
 
     def buttme(self, message, text):
         a = self.read_data(message.chat.id)
+        try:
+            offset = int(self.read_data(message.chat.id, 'timezone'))
+        except:
+            offset = 0
+
+        tz = 'GMT'
+        if offset >= 0:
+            tz += '+'
+        tz += str(offset)
 
         if a is True:
-            msg = 'Butt enabled, use /buttmeoff to disable it'
+            msg = '''\
+Butt enabled, use /buttmeoff to disable it.
+Your timezone is set to *%s*, use /buttgmt to change it.''' % tz
         else:
             msg = 'Butt disabled, use /buttmeon to enable it'
 
-        self.bot.send_message(message.chat.id, msg)
+        self.bot.send_message(message.chat.id, msg, parse_mode='Markdown')
 
     def buttmeon(self, message, text):
         self.save_data(message.chat.id, obj=True)
-        self.bot.send_message(message.chat.id, 'Butt enabled, use /buttmeoff to disable it')
+        try:
+            offset = int(self.read_data(message.chat.id, 'timezone'))
+        except:
+            offset = 0
+
+        tz = 'GMT'
+        if offset >= 0:
+            tz += '+'
+        tz += str(offset)
+
+        self.bot.send_message(message.chat.id, '''\
+Butt enabled, use /buttmeoff to disable it.
+Your timezone is set to *%s*, use /buttgmt to change it.''' % tz)
 
     def buttmeoff(self, message, text):
         self.save_data(message.chat.id, obj=False)
