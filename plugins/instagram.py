@@ -88,13 +88,14 @@ class InstagramPlugin(TGPluginBase):
 
     def cron_go(self, action, param):
         if action == 'instagram.butt':
-            from time import sleep
+            import time
 
             for chat in self.iter_data_keys():
                 if chat == 'cache':
                     continue
                 if self.read_data(chat):
                     print "Sending butt to %s" % chat
+                    time_start = time.time()
                     r = self._butt(chat, param)
                     if isinstance(r, Error):
                         if r.error_code == 403:
@@ -102,4 +103,6 @@ class InstagramPlugin(TGPluginBase):
                             self.save_data(chat, obj=False)
                         else:
                             print 'Error for', chat, ': ', r  # pragma: no cover
-                    sleep(0.5)
+                    time_taken = time.time() - time_start
+                    if time_taken < 0.5:
+                        time.sleep(0.5 - time_taken)
