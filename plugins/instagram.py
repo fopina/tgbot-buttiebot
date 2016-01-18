@@ -94,7 +94,7 @@ Apologies to India, Iran and some other places, but offsets are integers at the 
             offset = -999
 
         if offset < -12 or offset > 12:
-            res = 'Invalid offset value. It should be a number between -12 and 12'
+            res = 'Invalid offset value. It should be a number between -12 and 12 (no half-hour offsets at the moment, apologies to India, Iran, etc)'
         else:
             res = 'Timezone set to GMT'
             if offset >= 0:

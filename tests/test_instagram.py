@@ -212,7 +212,7 @@ Your timezone is set to *GMT+3*, use /buttgmt to change it.''')
             self.plugin.cron_go('instagram.butt')
             self.assertReplied(self.bot, 'Bon appetit!')
 
-    def test_buttgmt_validation(self, error_msg='Invalid offset value. It should be a number between -12 and 12'):
+    def test_buttgmt_validation(self, error_msg='Invalid offset value. It should be a number between -12 and 12 (no half-hour offsets at the moment, apologies to India, Iran, etc)'):
         self.receive_message('/buttgmt')
         self.receive_message('3')
         self.assertReplied(self.bot, 'Timezone set to GMT+3')
