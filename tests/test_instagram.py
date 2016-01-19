@@ -157,7 +157,7 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
                 return_value=time.struct_time((2016, 1, 18, 9, 50, 36, 0, 18, 0))
             ):
                 self.plugin.cron_go('instagram.butt')
-                self.assertEqual(len(self.bot._sent_messages), 0)
+                self.assertRaisesRegexp(AssertionError, 'No replies', self.last_reply, self.bot)
                 self.test_buttmeon()
                 self.plugin.cron_go('instagram.butt')
                 self.assertReplied(self.bot, 'Good morning!')
@@ -180,7 +180,7 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
                 'time.gmtime',
                 return_value=time.struct_time((2016, 1, 18, 20, 50, 36, 0, 18, 0))
             ):
-                self.bot._sent_messages = []  # clear messages
+                self.clear_replies(self.bot)  # clear messages
                 self.plugin.cron_go('instagram.butt')
                 self.assertRaisesRegexp(AssertionError, 'No replies', self.last_reply, self.bot)
 
@@ -213,7 +213,7 @@ Your timezone is set to *GMT+3*, use /buttgmt to change it.''')
             'time.gmtime',
             return_value=time.struct_time((2016, 1, 18, 9, 50, 36, 0, 18, 0))
         ):
-            self.bot._sent_messages = []  # clear messages
+            self.clear_replies(self.bot)  # clear messages
             self.plugin.cron_go('instagram.butt')
             self.assertRaisesRegexp(AssertionError, 'No replies', self.last_reply, self.bot)
 
