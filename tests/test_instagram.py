@@ -34,7 +34,7 @@ class FakePhotoTelegramBot(plugintest.FakeTelegramBot):
             }))
 
 
-class InstagramPluginTest(plugintest.PluginTestCase):
+class PluginTest(plugintest.PluginTestCase):
     def setUp(self):
         self.plugin = InstagramPlugin()
         self.bot = FakePhotoTelegramBot('', plugins=[self.plugin])
@@ -88,6 +88,34 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
         self.assertIn('Snorkeled', self.last_reply(self.bot))
         self.receive_message('/butt')
         self.assertIn('Snorkeled', self.last_reply(self.bot))
+
+    def test_butt_snorkeled(self):
+        import mock
+
+        def fget(*args, **kwargs):
+            r = type('Test', (object,), {})
+            r.content = '''
+            <script type="text/javascript">window._sharedData = {"entry_data":{"ProfilePage":[{"user": {"media": {"nodes":[{"caption": "Snorkeled", "id": "123", "likes": {"count": 1}, "display_src": "http://i1079.photobucket.com/albums/w514/skmobi/skmobi/site/logo.png"}]}}}]}};</script>
+            '''
+            return r
+
+        with mock.patch('requests.get', fget):
+            self.receive_message('/butt')
+            self.assertIn('Snorkeled', self.last_reply(self.bot))
+
+    def test_butt_snorkeled_not(self):
+        import mock
+
+        def fget(*args, **kwargs):
+            r = type('Test', (object,), {})
+            r.content = '''
+            <script type="text/javascript">window._sharedData = {"entry_data":{"ProfilePage":[{"user": {"media": {"nodes":[{"caption": "Eh #Snorkeled", "id": "123", "likes": {"count": 1}, "display_src": "http://i1079.photobucket.com/albums/w514/skmobi/skmobi/site/logo.png"}]}}}]}};</script>
+            '''
+            return r
+
+        with mock.patch('requests.get', fget):
+            self.receive_message('/butt')
+            self.assertReplied(self.bot, 'Sorry, no new butts found right now...')
 
     def test_butt_repeat(self):
         import mock

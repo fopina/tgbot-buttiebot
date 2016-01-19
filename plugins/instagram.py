@@ -28,14 +28,14 @@ class InstagramPlugin(TGPluginBase):
         pics = []
         for i in xrange(3):
             ig, keyword_filter = choice((
-                ('buttsnorkeler', 'Snorkeled'),
+                ('buttsnorkeler', u'^.?Snorkeled'),
                 # ('buttbuilding', ' '),  # crappy one...
             ))
             r = requests.get('https://instagram.com/%s/' % ig)
             m = re.findall('<script type="text\/javascript">window._sharedData = (.*?);<\/script>', r.content)
             s = json.loads(m[0])
             try:
-                pics = [x for x in s['entry_data']['ProfilePage'][0]['user']['media']['nodes'] if keyword_filter in x['caption']]
+                pics = [x for x in s['entry_data']['ProfilePage'][0]['user']['media']['nodes'] if re.match(keyword_filter, x['caption'])]
                 break
             except KeyError:
                 pass
