@@ -78,7 +78,7 @@ class InstagramPlugin(TGPluginBase):
 What's your GMT offset?
 Example, if you are in Beijing (China), the timezone is GMT+8, so you answer:
 *8*
-If you are in Bostan (USA), it is GMT-5, so you answer:
+If you are in Boston (USA), it is GMT-5, so you answer:
 *-5*
 Apologies to India, Iran and some other places, but offsets are integers at the moment, so half-hour deviations are not supported...''',
                 reply_to_message_id=message.message_id,
