@@ -180,6 +180,19 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
             self.assertEqual(self.pop_reply()[1]['caption'], 'Bon appetit!')  # some message was still sent, doesn't really matter
             self.test_buttme()  # check buttme was disabled
 
+    def test_butt_cron_weekend_break(self):
+        self.test_buttmeon()
+
+        import mock
+        import time
+
+        with mock.patch(
+            'time.gmtime',
+            return_value=time.struct_time((2016, 1, 17, 13, 50, 36, 5, 18, 0))
+        ):
+            self.plugin.cron_go('instagram.butt')
+            self.assertNoReplies()
+
     def test_buttgmt(self):
         self.receive_message('/buttgmt +3')
         self.assertReplied('Timezone set to GMT+3')

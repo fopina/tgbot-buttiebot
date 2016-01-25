@@ -154,6 +154,13 @@ Your timezone is set to *%s*, use /buttgmt to change it.''' % tz, parse_mode='Ma
     def cron_butt(self):
         import time
 
+        g = time.gmtime()
+
+        # take a break over the weekend!
+        # TODO: should this be related to timezone? bot is taking a break, not the user!
+        if g.tm_wday in [5, 6]:
+            return
+
         hour = time.gmtime().tm_hour
         for chat in self.iter_data_keys():
             if chat == 'cache':
