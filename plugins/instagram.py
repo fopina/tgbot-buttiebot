@@ -102,7 +102,7 @@ Apologies to India, Iran and some other places, but offsets are integers at the 
             res += str(offset)
             self.save_data(message.chat.id, key2='timezone', obj=offset)
 
-        self.bot.send_message(message.chat.id, res, parse_mode='Markdown')
+        return self.bot.return_message(message.chat.id, res, parse_mode='Markdown')
 
     def buttme(self, message, text):
         a = self.read_data(message.chat.id)
@@ -123,7 +123,7 @@ Your timezone is set to *%s*, use /buttgmt to change it.''' % tz
         else:
             msg = 'Butt disabled, use /buttmeon to enable it'
 
-        self.bot.send_message(message.chat.id, msg, parse_mode='Markdown')
+        return self.bot.return_message(message.chat.id, msg, parse_mode='Markdown')
 
     def buttmeon(self, message, text):
         self.save_data(message.chat.id, obj=True)
@@ -137,13 +137,13 @@ Your timezone is set to *%s*, use /buttgmt to change it.''' % tz
             tz += '+'
         tz += str(offset)
 
-        self.bot.send_message(message.chat.id, '''\
+        return self.bot.return_message(message.chat.id, '''\
 Butt enabled, use /buttmeoff to disable it.
 Your timezone is set to *%s*, use /buttgmt to change it.''' % tz, parse_mode='Markdown')
 
     def buttmeoff(self, message, text):
         self.save_data(message.chat.id, obj=False)
-        self.bot.send_message(message.chat.id, 'Butt disabled, use /buttmeon to enable it')
+        return self.bot.return_message(message.chat.id, 'Butt disabled, use /buttmeon to enable it')
 
     def cron_go(self, action, *args):
         if action == 'instagram.butt':
