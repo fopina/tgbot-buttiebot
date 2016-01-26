@@ -2,9 +2,6 @@
 from tgbot import plugintest
 from plugins.instagram import InstagramPlugin
 
-from requests.packages import urllib3
-urllib3.disable_warnings()
-
 
 class PluginTest(plugintest.PluginTestCase):
     def setUp(self):
