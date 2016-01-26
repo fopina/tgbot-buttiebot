@@ -85,7 +85,10 @@ Apologies to India, Iran and some other places, but offsets are integers at the 
                 reply_markup=ForceReply.create(selective=True),
                 parse_mode='Markdown'
             ).wait()
-            self.need_reply(self.buttgmt, message, out_message=m, selective=True)
+            if isinstance(m, Error):
+                print 'ERROR:', m
+            else:
+                self.need_reply(self.buttgmt, message, out_message=m, selective=True)
             return
 
         try:
