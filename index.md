@@ -2,7 +2,7 @@
 layout: index
 ---
 
-This is a friendly Telegram bot that will cheer your day, feel free to contact [@ButtieBot](http://telegram.me/buttiebot).
+xThis is a friendly Telegram bot that will cheer your day, feel free to contact [@ButtieBot](http://telegram.me/buttiebot).
 
 [![Build Status](https://travis-ci.org/fopina/tgbot-buttiebot.svg?branch=master)](https://travis-ci.org/fopina/tgbot-buttiebot) [![Coverage Status](https://coveralls.io/repos/fopina/tgbot-buttiebot/badge.svg?branch=master&service=github)](https://coveralls.io/github/fopina/tgbot-buttiebot?branch=master)
 
