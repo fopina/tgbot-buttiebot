@@ -58,7 +58,7 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
 
         with mock.patch('requests.get', fget):
             self.receive_message('/butt')
-            self.assertReplied('Sorry, no new butts found right now...')
+            self.assertReplied('Sorry, no butts found at the moment...')
 
     def test_butt_repeat(self):
         import mock
@@ -72,9 +72,16 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
 
         with mock.patch('requests.get', fget):
             self.receive_message('/butt')
-            self.assertIn('Snorkeled', self.pop_reply()[1]['caption'])
+            r = self.pop_reply()
+            self.assertEqual(r[0], 'sendPhoto')
+            self.assertEqual(r[2][0].file_info.file_name, 'logo.png')
+            self.assertIn('Snorkeled', r[1]['caption'])
             self.receive_message('/butt')
-            self.assertReplied('Sorry, no new butts found right now...')
+            # validate it is the same photo
+            r = self.pop_reply()
+            self.assertEqual(r[0], 'sendPhoto')
+            self.assertEqual(r[2][0].file_info.file_name, 'logo.png')
+            self.assertEqual(r[1]['caption'], u'Déjà vu? Sorry, no new butts found at the moment...')
 
     def test_butt_cache(self):
         import mock
@@ -111,7 +118,7 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
 
         with mock.patch('requests.get', fget):
             self.receive_message('/butt')
-            self.assertReplied('Sorry, no new butts found right now...')
+            self.assertReplied('Sorry, no butts found at the moment...')
 
     def test_butt_cron(self):
         import mock

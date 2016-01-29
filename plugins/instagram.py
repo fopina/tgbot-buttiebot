@@ -42,10 +42,16 @@ class InstagramPlugin(TGPluginBase):
             from time import sleep
             sleep(1)
 
-        pics = [x for x in pics if not self.read_data(chat_id, x['id'])]
         if not pics:
-            return self.bot.send_message(chat_id, 'Sorry, no new butts found right now...').wait()
+            return self.bot.send_message(chat_id, 'Sorry, no butts found at the moment...').wait()
+
         pic = choice(pics)
+        pics = [x for x in pics if not self.read_data(chat_id, x['id'])]
+        if pics:
+            pic = choice(pics)
+        else:
+            if not text:
+                text = u'Déjà vu? Sorry, no new butts found at the moment...'
 
         self.save_data(chat_id, key2=pic['id'], obj=True)
 
@@ -85,10 +91,7 @@ Apologies to India, Iran and some other places, but offsets are integers at the 
                 reply_markup=ForceReply.create(selective=True),
                 parse_mode='Markdown'
             ).wait()
-            if isinstance(m, Error):
-                print 'ERROR:', m
-            else:
-                self.need_reply(self.buttgmt, message, out_message=m, selective=True)
+            self.need_reply(self.buttgmt, message, out_message=m, selective=True)
             return
 
         try:
