@@ -40,6 +40,7 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
             r.content = '''
             <script type="text/javascript">window._sharedData = {"entry_data":{"ProfilePage":[{"user": {"media": {"nodes":[{"caption": "Snorkeled", "id": "123", "likes": {"count": 1}, "display_src": "http://i1079.photobucket.com/albums/w514/skmobi/skmobi/site/logo.png"}]}}}]}};</script>
             '''
+            r.headers = {'content-type': 'image/logo.png'}
             return r
 
         with mock.patch('requests.get', fget):
@@ -54,6 +55,7 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
             r.content = '''
             <script type="text/javascript">window._sharedData = {"entry_data":{"ProfilePage":[{"user": {"media": {"nodes":[{"caption": "Eh #Snorkeled", "id": "123", "likes": {"count": 1}, "display_src": "http://i1079.photobucket.com/albums/w514/skmobi/skmobi/site/logo.png"}]}}}]}};</script>
             '''
+            r.headers = {'content-type': 'image/logo.png'}
             return r
 
         with mock.patch('requests.get', fget):
@@ -68,6 +70,7 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
             r.content = '''
             <script type="text/javascript">window._sharedData = {"entry_data":{"ProfilePage":[{"user": {"media": {"nodes":[{"caption": "Snorkeled", "id": "123", "likes": {"count": 1}, "display_src": "http://i1079.photobucket.com/albums/w514/skmobi/skmobi/site/logo.png"}]}}}]}};</script>
             '''
+            r.headers = {'content-type': 'image/jpeg'}
             return r
 
         with mock.patch('requests.get', fget):
@@ -132,6 +135,7 @@ Your timezone is set to *GMT+0*, use /buttgmt to change it.'''):
             if 'cdninstagram.com' in args[0]:
                 r = type('Test', (object,), {})
                 r.content = ''
+                r.headers = {'content-type': 'image/jpeg'}
                 return r
             return rget(*args, **kwargs)
 
