@@ -6,7 +6,6 @@ import requests
 import re
 import json
 from cStringIO import StringIO
-import mimetypes
 
 
 class InstagramPlugin(TGPluginBase):
@@ -65,14 +64,16 @@ class InstagramPlugin(TGPluginBase):
             if not isinstance(r, Error):
                 return r
 
-        fp = StringIO(requests.get(pic['display_src']).content)
-        file_info = InputFileInfo(pic['display_src'].split('/')[-1], fp, mimetypes.guess_type(pic['display_src'])[0])
-        r = self.bot.send_photo(chat_id=chat_id, caption=text, photo=InputFile('photo', file_info)).wait()
+        r = requests.get(pic['display_src'])
+        fp = StringIO(r.content)
+        file_info = InputFileInfo(pic['display_src'].split('/')[-1].split('?')[0], fp, r.headers.get('content-type'))
 
+        r = self.bot.send_photo(chat_id, InputFile('photo', file_info), caption=text).wait()
         if isinstance(r, Error):
             return r
         if r.photo:
             self.save_data('cache', key2=pic['id'], obj=r.photo[0].file_id)
+
         return r
 
     def buttgmt(self, message, text):
