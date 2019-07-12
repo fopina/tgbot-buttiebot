@@ -6,6 +6,9 @@ import requests
 import re
 import json
 from cStringIO import StringIO
+from instascrape import scrape
+
+RE_SNORKEL = re.compile(u'^.?Snorkeled')
 
 
 class InstagramPlugin(TGPluginBase):
@@ -24,22 +27,19 @@ class InstagramPlugin(TGPluginBase):
     def _butt(self, chat_id, text):
         self.bot.send_chat_action(chat_id, ChatAction.PHOTO)
 
+        ig, keyword_filter = choice((
+            ('buttsnorkeler', RE_SNORKEL),
+            # ('buttbuilding', ' '),  # crappy one...
+        ))
+
         pics = []
-        for i in xrange(3):
-            ig, keyword_filter = choice((
-                ('buttsnorkeler', u'^.?Snorkeled'),
-                # ('buttbuilding', ' '),  # crappy one...
-            ))
-            r = requests.get('https://instagram.com/%s/' % ig)
-            m = re.findall('<script type="text\/javascript">window._sharedData = (.*?);<\/script>', r.content)
-            s = json.loads(m[0])
-            try:
-                pics = [x for x in s['entry_data']['ProfilePage'][0]['user']['media']['nodes'] if re.match(keyword_filter, x['caption'])]
+        it = 0
+        for x in scrape(ig):
+            it += 1
+            if keyword_filter.match(x['caption']):
+                pics.append(x)
+            if len(pics) > 10 or it > 50:
                 break
-            except KeyError:
-                pass
-            from time import sleep
-            sleep(1)
 
         if not pics:
             return self.bot.send_message(chat_id, 'Sorry, no butts found at the moment...').wait()
@@ -55,7 +55,7 @@ class InstagramPlugin(TGPluginBase):
         self.save_data(chat_id, key2=pic['id'], obj=True)
 
         if not text:
-            text = '%s (%d likes)' % (pic['caption'], pic['likes']['count'])
+            text = '%s (%d likes)' % (pic['caption'], pic['edge_media_preview_like']['count'])
 
         photo = self.read_data('cache', key2=pic['id'])
 
@@ -64,9 +64,9 @@ class InstagramPlugin(TGPluginBase):
             if not isinstance(r, Error):
                 return r
 
-        r = requests.get(pic['display_src'])
+        r = requests.get(pic['display_url'])
         fp = StringIO(r.content)
-        file_info = InputFileInfo(pic['display_src'].split('/')[-1].split('?')[0], fp, r.headers.get('content-type'))
+        file_info = InputFileInfo(pic['display_url'].split('/')[-1].split('?')[0], fp, r.headers.get('content-type'))
 
         r = self.bot.send_photo(chat_id, InputFile('photo', file_info), caption=text).wait()
         if isinstance(r, Error):
