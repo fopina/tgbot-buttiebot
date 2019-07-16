@@ -7,6 +7,7 @@ import re
 import json
 from cStringIO import StringIO
 from instascrape import scrape
+from itertools import islice
 
 RE_SNORKEL = re.compile(u'^.?Snorkeled')
 
@@ -33,13 +34,9 @@ class InstagramPlugin(TGPluginBase):
         ))
 
         pics = []
-        it = 0
-        for x in scrape(ig):
-            it += 1
+        for x in islice(scrape(ig), 100):
             if keyword_filter.match(x['caption']):
                 pics.append(x)
-            if len(pics) > 10 or it > 50:
-                break
 
         if not pics:
             return self.bot.send_message(chat_id, 'Sorry, no butts found at the moment...').wait()
