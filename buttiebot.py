@@ -96,4 +96,6 @@ def build_parser():
 
 
 if __name__ == '__main__':
+    import logging
+    logging.basicConfig()
     main()

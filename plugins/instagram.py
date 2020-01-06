@@ -1,15 +1,19 @@
 # coding=utf-8
-from tgbot.pluginbase import TGPluginBase, TGCommandBase
-from tgbot.tgbot import ChatAction, InputFile, InputFileInfo, Error, ForceReply
-from random import choice
 import requests
 import re
 import json
-from cStringIO import StringIO
-from instascrape import scrape
+import logging
+from random import choice
 from itertools import islice
+from cStringIO import StringIO
+
+from instascrape import scrape
+from tgbot.pluginbase import TGPluginBase, TGCommandBase
+from tgbot.tgbot import ChatAction, InputFile, InputFileInfo, Error, ForceReply
+
 
 RE_SNORKEL = re.compile(u'^.?Snorkeled')
+logger = logging.getLogger(__name__)
 
 
 class InstagramPlugin(TGPluginBase):
@@ -34,9 +38,12 @@ class InstagramPlugin(TGPluginBase):
         ))
 
         pics = []
-        for x in islice(scrape(ig), 100):
-            if keyword_filter.match(x['caption']):
-                pics.append(x)
+        try:
+            for x in islice(scrape(ig), 100):
+                if keyword_filter.match(x['caption']):
+                    pics.append(x)
+        except:
+            logger.exception('failed to scrape')
 
         if not pics:
             return self.bot.send_message(chat_id, 'Sorry, no butts found at the moment...').wait()
